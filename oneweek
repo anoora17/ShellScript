@@ -1,0 +1,59 @@
+#!/bin/bash
+
+#This script is creat ein account on the loacl system.
+# you will be prompt for the account name and password.
+
+# Make sure the script is being executed with superuser privileges.
+if [[ "${UID}" -ne 0 ]]
+then 
+   echo 'Please run wuth sudo or as root.'
+exit 1
+fi
+
+# Ask for user name.
+ read -p 'Enter the username to create: ' USER_NAME
+# Ask for real name
+read -p 'Enter the name of person who this account is for: ' COMENT
+
+# Ask for the password
+
+read -p 'Enter the password to use for the account: ' PASSWORD
+# creat euser
+useradd -c "${COMENT}" -m ${USER_NAME}
+
+
+#Check to see if the useradd command succeeded.
+# We don't want to tell the user that an account was created when it hasn't been.
+
+if [[ "${?}" -ne 0 ]]
+then 
+ echo 'The account could not be created.'
+exit 1
+fi 
+
+# Ste the passowrd for the user
+echo ${PASSWORD} | password --stdin ${USER_NAME}
+
+if [[ "${?}" -ne 0 ]]
+then
+  echo 'The password for the account could not be set.'
+exit 1
+fi 
+# Force passowrd cvhang on first login.
+passwd -e ${USER_NAME}
+
+
+# Display the isername, Password, and the host where the user was created.
+
+echo 
+echo 'username'
+echo"${USER_NAME}"
+
+echo 'Password'
+echo "${PASSWORD}"
+
+echo 'Host:'
+echo "${HOSTNAME}"
+
+
+exit 0
