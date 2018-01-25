@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#Make sure the script is being executed with superuser privilages.
+
+if [[ "${UID}"  -ne 0 ]]
+then
+  echo "You dont have root permission"
+  exit 1
+fi
+
+#If the user doesn't supply at least one argument, then give them help.
+
+if [[ ${#} -eq 0]]
+then 
+  echo "Usage: ${0} USER_NAME [COMMENT]..."
+  echo 'Please Create an account first'
+  exit 1
+fi
+
+# The first Parameter is user name.
+USER_NAME= "${1}"
+
+#The rest if the parameters are for the account comments.
+COMMENT="${@}"
+
+#Generate a strong password
+PASSWORD=$(date +%s%n | sha256sum | head -c48)
+
+#Creat the user with password
+useradd -c "S{COMMENT}" -m ${USER_NAME}
+
+# Chek if the user added command succeeded
+
+if [[ ${?} -ne 0 ]] 
+then
+ echo 'The account is not created'
+ exit 1
+fi
+
+# Set the password
+echo ${PASSWORD} | passwd --stdin ${USER_NAME}
+
+# Check to see if the password command succeeded
+if [[ "${?} -ne 0 "]]
+then
+   echo 'The Password does not meet the requiremnts'
+   exit 1
+fi
+# force the passowrd change on the first login
+passwd -e ${USER_NAME}
+
+# Diplay the results
+echo 'username'
+echo "${USER_NAME}"
+echo 'Password'
+echo "${PASSWORD}"      
+
