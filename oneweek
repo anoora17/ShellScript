@@ -61,3 +61,4 @@ echo "${HOSTNAME}"
 
 
 exit 0
+#exit zero to make sure everything went correct!
